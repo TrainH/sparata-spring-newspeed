@@ -1,7 +1,6 @@
 package spartaspringnewspeed.spartafacespeed.common.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Comment {
+public class Comment extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long commentId;
+
+    private String content;
+
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
+    @ManyToOne
+    @
 
 }
