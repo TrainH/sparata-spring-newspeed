@@ -30,8 +30,7 @@ public class CommentController {
                                                     @RequestBody CreateCommentRequest request,
                                                     HttpSession session,
                                                     HttpServletResponse response) {
-        Long userId =2L;
-//        Long userId = (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
 
         return new ResponseEntity<>(commentService.createComment(request, userId, postId), HttpStatus.CREATED);
     }
@@ -49,8 +48,7 @@ public class CommentController {
                                                     @PathVariable Long commentId,
                                                     @RequestBody UpdateCommentRequest request,
                                                     HttpSession session) {
-        Long userId = 1L;
-//        Long userId = (Long) session.getAttribute("userId");
+        Long userId = (Long) session.getAttribute("userId");
         return new ResponseEntity<>(commentService.updateComment(request, userId, postId, commentId), HttpStatus.OK);
     }
 

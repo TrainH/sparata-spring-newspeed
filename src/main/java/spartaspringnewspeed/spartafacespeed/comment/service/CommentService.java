@@ -71,7 +71,6 @@ public class CommentService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Does not exist post id = " + postId);
         }
 
-        Post post = postRepository.findPostByIdOrThrow(postId);
         User user = userRepository.findByUserIdOrElseThrow(comment.getUser().getUserId());;
 
         if(!user.getUserId().equals(userId)) {
