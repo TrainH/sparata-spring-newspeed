@@ -3,8 +3,10 @@ package spartaspringnewspeed.spartafacespeed.comment.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentDto;
 import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentPagingDto;
 import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentRequest;
@@ -66,14 +68,14 @@ public class CommentService {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
 
         if(!comment.getPost().getId().equals(postId)) {
-            //예외처리
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Does not exist post id = " + postId);
         }
 
         Post post = postRepository.findPostByIdOrThrow(postId);
-        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getUserId());;
+        User user = userRepository.findByUserIdOrElseThrow(comment.getUser().getUserId());;
 
         if(!user.getUserId().equals(userId)) {
-            //예외처리
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"You are not allowed this comment.");
         }
         comment.setContent(request.getContent());
 
@@ -94,14 +96,14 @@ public class CommentService {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
 
         if(!comment.getPost().getId().equals(postId)) {
-            //예외처리
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Does not exist post id = " + postId);
         }
 
         Post post = postRepository.findPostByIdOrThrow(postId);
         User user = userRepository.findByUserIdOrElseThrow(post.getUser().getUserId());
 
         if(!user.getUserId().equals(userId)) {
-            //예외처리
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"You are not allowed this comment.");
         }
 
         commentRepository.delete(comment);

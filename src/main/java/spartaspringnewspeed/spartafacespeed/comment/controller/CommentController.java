@@ -1,6 +1,7 @@
 package spartaspringnewspeed.spartafacespeed.comment.controller;
 
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,8 @@ import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentR
 import spartaspringnewspeed.spartafacespeed.comment.model.request.UpdateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.service.CommentService;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -25,8 +28,11 @@ public class CommentController {
     @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId,
                                                     @RequestBody CreateCommentRequest request,
-                                                    HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
+                                                    HttpSession session,
+                                                    HttpServletResponse response) {
+        Long userId =2L;
+//        Long userId = (Long) session.getAttribute("userId");
+
         return new ResponseEntity<>(commentService.createComment(request, userId, postId), HttpStatus.CREATED);
     }
 
@@ -43,7 +49,8 @@ public class CommentController {
                                                     @PathVariable Long commentId,
                                                     @RequestBody UpdateCommentRequest request,
                                                     HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = 1L;
+//        Long userId = (Long) session.getAttribute("userId");
         return new ResponseEntity<>(commentService.updateComment(request, userId, postId, commentId), HttpStatus.OK);
     }
 
