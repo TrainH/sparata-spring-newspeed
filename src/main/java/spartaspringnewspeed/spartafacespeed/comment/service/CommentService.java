@@ -79,11 +79,18 @@ public class CommentService {
 //
 //        commentRepository.saveAndFlush(comment);
 //        return new CommentDto(comment,user,post);
-//        return null;
 //    }
 //
+
+//    /**
+//     *
+//     * @param userId 유저 식별자
+//     * @param postId 게시글 식별자
+//     * @param commentId 댓글 식별자
+//     * @return Void, controller에서 반환 시 String 타입 출력
+//     */
 //    @Transactional
-//    public Void deleteComment(Long userId, Long postId, Long commentId){
+//    public String deleteComment(Long userId, Long postId, Long commentId){
 //        Comment comment = commentRepository.findByIdOrElseThrow(commentId);
 //
 //        if(!comment.getPost().getId().equals(postId)) {
@@ -98,6 +105,7 @@ public class CommentService {
 //        }
 //
 //        commentRepository.delete(comment);
+//    return "삭제완료";
 //    }
 
 

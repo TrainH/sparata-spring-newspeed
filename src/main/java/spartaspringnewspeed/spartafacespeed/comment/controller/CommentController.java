@@ -46,7 +46,7 @@ public class CommentController {
 //    }
 
 //    @DeleteMapping("/{postId}/comments/{commentId}")
-//    public ResponseEntity<Void> deleteComment(@PathVariable Long postId,
+//    public ResponseEntity<String> deleteComment(@PathVariable Long postId,
 //                                              @PathVariable Long commentId,
 //                                              HttpSession session) {
 //        Long userId = (Long)session.getAttribute("userId");
