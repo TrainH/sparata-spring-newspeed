@@ -68,18 +68,7 @@ public class CommentService {
      */
     @Transactional
     public CommentDto updateComment(UpdateCommentRequest request, Long userId, Long postId, Long commentId) {
-        Comment comment = commentRepository.findByIdOrElseThrow(commentId);
-
-        if (!comment.getPost().getId().equals(postId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist post id = " + postId);
-        }
-
-        User user = userRepository.findByUserIdOrElseThrow(comment.getUser().getUserId());
-        ;
-
-        if (!user.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed this comment.");
-        }
+        Comment comment = getComment(userId, postId, commentId);
         comment.setContent(request.getContent());
 
         commentRepository.saveAndFlush(comment);
@@ -95,21 +84,25 @@ public class CommentService {
      */
     @Transactional
     public String deleteComment(Long userId, Long postId, Long commentId) {
+        Comment comment = getComment(userId, postId, commentId);
+
+        commentRepository.delete(comment);
+        return "삭제완료";
+    }
+
+    private Comment getComment(Long userId, Long postId, Long commentId) {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
 
         if (!comment.getPost().getId().equals(postId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist post id = " + postId);
         }
 
-        Post post = postRepository.findPostByIdOrThrow(postId);
-        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getUserId());
+        User user = userRepository.findByUserIdOrElseThrow(comment.getUser().getUserId());
 
         if (!user.getUserId().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed this comment.");
         }
-
-        commentRepository.delete(comment);
-        return "삭제완료";
+        return comment;
     }
 
 

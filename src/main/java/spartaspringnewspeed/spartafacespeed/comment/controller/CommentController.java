@@ -26,7 +26,6 @@ public class CommentController {
     @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CreateCommentRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-
         return new ResponseEntity<>(commentService.createComment(request, userId, postId), HttpStatus.CREATED);
     }
 
