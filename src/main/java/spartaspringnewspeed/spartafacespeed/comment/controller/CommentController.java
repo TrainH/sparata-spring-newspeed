@@ -3,15 +3,11 @@ package spartaspringnewspeed.spartafacespeed.comment.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentDto;
-import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommetRequest;
-import spartaspringnewspeed.spartafacespeed.comment.model.request.UpdateCommentRequest;
+import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.service.CommentService;
 
 @RestController
@@ -22,7 +18,7 @@ public class CommentController {
 
     @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId,
-                                                    @RequestBody CreateCommetRequest request,
+                                                    @RequestBody CreateCommentRequest request,
                                                     HttpSession session){
         Long userId = (Long)session.getAttribute("userId");
         return new ResponseEntity<>(commentService.createComment(request,userId,postId), HttpStatus.CREATED);

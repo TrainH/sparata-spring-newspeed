@@ -1,18 +1,10 @@
 package spartaspringnewspeed.spartafacespeed.comment.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentDto;
-import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommetRequest;
-import spartaspringnewspeed.spartafacespeed.comment.model.request.UpdateCommentRequest;
+import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository;
-import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
-import spartaspringnewspeed.spartafacespeed.common.entity.Post;
-import spartaspringnewspeed.spartafacespeed.common.entity.User;
-import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
 @Service
@@ -31,7 +23,7 @@ public class CommentService {
      * @param postId URL - 게시글 아이디
      * @return CommentDto
      */
-    public CommentDto createComment(CreateCommetRequest request,long userId, long postId) {
+    public CommentDto createComment(CreateCommentRequest request, long userId, long postId) {
 //        Post post = postRepository.findByOrElseThrow(postId);
 //        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getId());
 //
@@ -60,7 +52,7 @@ public class CommentService {
 //     * @param userId 유저 식별자
 //     * @param postId 게시글 식별자
 //     * @param commentId 댓글 식별자
-//     * @return
+//     * @return CommentDto
 //     */
 //    @Transactional
 //    public CommentDto updateComment(UpdateCommentRequest request, Long userId,Long postId, Long commentId){
