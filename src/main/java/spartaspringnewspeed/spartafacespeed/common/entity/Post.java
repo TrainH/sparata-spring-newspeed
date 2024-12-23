@@ -16,9 +16,6 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
     private String content;
 
     @ManyToOne
