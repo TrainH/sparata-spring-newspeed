@@ -1,7 +1,6 @@
 package spartaspringnewspeed.spartafacespeed.comment.controller;
 
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,6 @@ import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentR
 import spartaspringnewspeed.spartafacespeed.comment.model.request.UpdateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.service.CommentService;
 
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,36 +24,26 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long postId,
-                                                    @RequestBody CreateCommentRequest request,
-                                                    HttpSession session,
-                                                    HttpServletResponse response) {
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CreateCommentRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
         return new ResponseEntity<>(commentService.createComment(request, userId, postId), HttpStatus.CREATED);
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId,
-                                                              @RequestParam(defaultValue = "5") int pageSize,
-                                                              @RequestParam(defaultValue = "1") int pageNumber) {
+    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId, @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "1") int pageNumber) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return new ResponseEntity<>(commentService.getCommentsByPostId(postId, pageable), HttpStatus.OK);
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long postId,
-                                                    @PathVariable Long commentId,
-                                                    @RequestBody UpdateCommentRequest request,
-                                                    HttpSession session) {
+    public ResponseEntity<CommentDto> updateComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody UpdateCommentRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         return new ResponseEntity<>(commentService.updateComment(request, userId, postId, commentId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long postId,
-                                                @PathVariable Long commentId,
-                                                HttpSession session) {
+    public ResponseEntity<String> deleteComment(@PathVariable Long postId, @PathVariable Long commentId, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         return new ResponseEntity<>(commentService.deleteComment(userId, postId, commentId), HttpStatus.OK);
     }
