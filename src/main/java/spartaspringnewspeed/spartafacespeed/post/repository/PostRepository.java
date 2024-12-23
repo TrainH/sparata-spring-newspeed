@@ -10,10 +10,11 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Optional<Post> findByPostId(Long postId);
+  Optional<Post> findById(Long id);
 
-    default Post findPostById(Long postId) {
-        return findByPostId(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist postId = " + postId));
+    default Post findPostById(Long id) {
+        return findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist postId = " + id));
     }
+
 }
