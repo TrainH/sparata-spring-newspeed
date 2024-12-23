@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentDto;
 import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository;
+import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
+import spartaspringnewspeed.spartafacespeed.common.entity.Post;
+import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
 @Service
@@ -12,7 +16,7 @@ import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-//    private final PostRepository postRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
 
 
@@ -24,15 +28,14 @@ public class CommentService {
      * @return CommentDto
      */
     public CommentDto createComment(CreateCommentRequest request, long userId, long postId) {
-//        Post post = postRepository.findByOrElseThrow(postId);
-//        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getId());
-//
-//        Comment saveComment = new Comment(request.getContent(),user, post);
-//
-//        commentRepository.save(saveComment);
-//
-//        return new CommentDto(commentRepository.findByIdOrElseThrow(saveComment.getCommentId()));
-        return new CommentDto();
+        Post post = postRepository.findPostByIdOrThrow(postId);
+        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getUserId());
+
+        Comment saveComment = new Comment(request.getContent(),user, post);
+
+        commentRepository.save(saveComment);
+
+        return new CommentDto(commentRepository.findByIdOrElseThrow(saveComment.getId()));
     }
 
 //    /**
