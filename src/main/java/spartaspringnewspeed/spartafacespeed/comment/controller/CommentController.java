@@ -17,6 +17,7 @@ import spartaspringnewspeed.spartafacespeed.comment.service.CommentService;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/posts")
 public class CommentController {
 
     private final CommentService commentService;
