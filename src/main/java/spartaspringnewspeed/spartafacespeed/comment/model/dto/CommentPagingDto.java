@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,4 +16,7 @@ public class CommentPagingDto {
     private Long userId;
     private Long postId;
     private String content;
+    private LocalDateTime createAt;
+    private LocalDateTime modifiedAt;
+    private Long commentCount;
 }
