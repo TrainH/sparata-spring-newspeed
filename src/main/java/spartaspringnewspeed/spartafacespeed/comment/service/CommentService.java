@@ -21,7 +21,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 //    private final PostRepository postRepository;
-//    private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -33,7 +33,7 @@ public class CommentService {
      */
     public CommentDto createComment(CreateCommetRequest request,long userId, long postId) {
 //        Post post = postRepository.findByOrElseThrow(postId);
-//        User user = userRepository.findByOrElseThrow(post.getUser.getId());
+//        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getId());
 //
 //        Comment saveComment = new Comment(request.getContent(),user, post);
 //
@@ -71,7 +71,7 @@ public class CommentService {
 //        }
 //
 //        Post post = postRepository.findByOrElseThrow(postId);
-//        User user = userRepository.findByOrElseThrow(post.getUser.getId());
+//        User user = userRepository.findByUserIdOrElseThrow(post.getUser.getId());;
 //
 //        if(!user.getId().equals(userId)) {
 //            //예외처리
@@ -98,7 +98,7 @@ public class CommentService {
 //        }
 //
 //        Post post = postRepository.findByOrElseThrow(postId);
-//        User user = userRepository.findByOrElseThrow(post.getUser.getId());
+//        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getId());
 //
 //        if(!user.getId().equals(userId)) {
 //            //예외처리
