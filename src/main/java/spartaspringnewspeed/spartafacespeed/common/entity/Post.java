@@ -16,8 +16,10 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String content;
+    private String title;
 
+    @Column(nullable = false)
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)

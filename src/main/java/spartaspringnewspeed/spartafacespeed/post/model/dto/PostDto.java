@@ -19,7 +19,6 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
     public PostDto(Post post) {
         this.id = post.getId();
         this.content = post.getContent();
