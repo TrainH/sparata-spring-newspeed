@@ -14,7 +14,6 @@ import spartaspringnewspeed.spartafacespeed.common.entity.Post;
 @NoArgsConstructor
 public class PostDto {
     private Long id;
-    private String title;
     private String content;
     private Long userId;
     private LocalDateTime createdAt;
@@ -22,7 +21,6 @@ public class PostDto {
 
     public PostDto(Post post) {
         this.id = post.getId();
-        this.title = post.getTitle();
         this.content = post.getContent();
         this.userId = post.getUser().getUserId();
         this.createdAt = post.getCreatedAt();
