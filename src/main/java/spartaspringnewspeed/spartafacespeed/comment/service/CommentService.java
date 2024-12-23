@@ -75,6 +75,7 @@ public class CommentService {
         if(!user.getUserId().equals(userId)) {
             //예외처리
         }
+        comment.setContent(request.getContent());
 
         commentRepository.saveAndFlush(comment);
         return new CommentDto(comment);

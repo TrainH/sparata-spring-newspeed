@@ -50,7 +50,8 @@ public class CommentController {
     public ResponseEntity<String> deleteComment(@PathVariable Long postId,
                                               @PathVariable Long commentId,
                                               HttpSession session) {
-        Long userId = (Long)session.getAttribute("userId");
+        Long userId = 1L;
+        //        Long userId = (Long)session.getAttribute("userId");
         return new ResponseEntity<>(commentService.deleteComment(userId,postId,commentId),HttpStatus.OK);
     }
 
