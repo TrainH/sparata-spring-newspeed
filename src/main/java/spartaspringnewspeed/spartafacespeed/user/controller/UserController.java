@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 import spartaspringnewspeed.spartafacespeed.user.model.request.DeletionRequest;
+import spartaspringnewspeed.spartafacespeed.user.model.request.LoginRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 import spartaspringnewspeed.spartafacespeed.user.service.UserService;
 
@@ -27,5 +28,21 @@ public class UserController {
         userService.softDeleteUser(request);
         session.invalidate();
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> getUserId(@Valid @RequestBody LoginRequest request, HttpSession session) {
+        Long userId = userService.getUserId(request);
+
+        session.setAttribute("userId", userId);
+
+        return new ResponseEntity<>("로그인 성공했습니다.", HttpStatus.OK);
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+        session.invalidate();
+        return new ResponseEntity<>("로그아웃 성공했습니다.",HttpStatus.OK);
     }
 }

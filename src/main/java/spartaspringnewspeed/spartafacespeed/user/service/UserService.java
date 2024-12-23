@@ -9,6 +9,7 @@ import spartaspringnewspeed.spartafacespeed.common.exception.LoginException;
 import spartaspringnewspeed.spartafacespeed.common.exception.ValidateException;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 import spartaspringnewspeed.spartafacespeed.user.model.request.DeletionRequest;
+import spartaspringnewspeed.spartafacespeed.user.model.request.LoginRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
@@ -40,4 +41,12 @@ public class UserService {
         }
     }
 
+    public Long getUserId(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email());
+        if(passwordEncoder.matches(request.password(), user.getPassword())) {
+            return user.getUserId();
+        } else {
+            throw new LoginException("비밀먼호가 일치하지 않습니다.");
+        }
+    }
 }
