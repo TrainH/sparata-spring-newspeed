@@ -7,13 +7,9 @@ import spartaspringnewspeed.spartafacespeed.post.model.dto.PostDto;
 
 @Controller
 public class PostController {
-    @GetMapping("/posts/new")
-    public String newPostForm() {
-        return "posts/new";
-    }
-    @PostMapping("/posts/create")
+    @PostMapping("/posts")
     public String createPost(PostDto postDto) {
 
-        return "posts/create";
+        return "posts";
     }
 }
