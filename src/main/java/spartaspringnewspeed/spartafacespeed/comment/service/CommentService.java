@@ -33,10 +33,10 @@ public class CommentService {
      * @return CommentDto
      */
     public CommentDto createComment(CreateCommentRequest request, long userId, long postId) {
-        Post post = postRepository.findPostByIdOrThrow(postId);
-        User user = userRepository.findByUserIdOrElseThrow(post.getUser().getUserId());
+        Post post = postRepository.findPostByIdOrThrow(postId);//댓글을 작성할 포스트 찾기
+        User user = userRepository.findByUserIdOrElseThrow(userId);//댓글 작성 유저 찾기
 
-        Comment saveComment = new Comment(request.getContent(),user, post);
+        Comment saveComment = new Comment(request.getContent(),user, post); //해당 포스트에 입력할 댓글 만들기
 
         commentRepository.save(saveComment);
 
@@ -75,6 +75,7 @@ public class CommentService {
         if(!user.getUserId().equals(userId)) {
             //예외처리
         }
+        comment.setContent(request.getContent());
 
         commentRepository.saveAndFlush(comment);
         return new CommentDto(comment);
