@@ -26,18 +26,6 @@ public class FriendController {
     @Autowired
     private FriendService friendService;
 
-    @PostMapping("/TestSetUser")
-    public ResponseEntity<String> TestSetUser(@Valid @RequestBody TestUserRequest userRequest,
-                                              BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            log.info("Validation errors occurred");
-            return ResponseEntity.badRequest().body("Validation errors occurred");
-        }
-
-        friendService.setTestUser(userRequest);
-        return ResponseEntity.ok("Test worked");
-    }
-
     // 친구 요청 페이지 이동
     @GetMapping("/request")
     public ResponseEntity<FriendRequest> showFriendRequestForm() {
