@@ -24,6 +24,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     long countByPost_Id(Long id);
 
-
 }
 

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Table(uniqueConstraints ={
         @UniqueConstraint(name = "user_like_post",
@@ -27,6 +29,7 @@ public class PostLike {
 
     @ManyToOne
     @JoinColumn(name = "post_id",nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     public PostLike(User user, Post post) {
