@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Liking {
+public class LikingPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
