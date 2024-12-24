@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 
 @Entity
 @Getter
@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +31,20 @@ public class User {
 //    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Profile profile;
 
+    private boolean isDeleted;
+
     public User(String userName, String email, String password) {
         this.userName = userName;
         this.email = email;
         this.password = password;
     }
+
+    public static User createUser(SignUpRequest request, String encodePassword, boolean isDeleted) {
+        return new User(null, request.userName(), request.email(), encodePassword, isDeleted);
+    }
+
+    public void updateDeletionStatus(boolean status) {
+        this.isDeleted = status;
+    }
+
 }

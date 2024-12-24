@@ -2,19 +2,29 @@ package spartaspringnewspeed.spartafacespeed.post.model.dto;
 
 import java.time.LocalDateTime;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import spartaspringnewspeed.spartafacespeed.common.entity.Post;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostDto {
-    private String postContent;
-    private String userName;
-    private String postTitle;
+    private Long id;
+    private String content;
+    private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public PostDto() {
-        this.postTitle=postTitle;
-        this.postContent=postContent;
-        this.userName=userName;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
+    public PostDto(Post post) {
+        this.id = post.getId();
+        this.content = post.getContent();
+        this.userId = post.getUser().getUserId();
+        this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
     }
 
 

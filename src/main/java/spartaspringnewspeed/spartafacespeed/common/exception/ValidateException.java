@@ -1,4 +1,14 @@
 package spartaspringnewspeed.spartafacespeed.common.exception;
 
-public class ValidateException {
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public class ValidateException extends RuntimeException {
+    private HttpStatus httpStatus;
+    private String message;
+    public ValidateException(String message, HttpStatus httpStatus) {
+        this.message = message;
+        this.httpStatus = httpStatus;
+    }
 }
