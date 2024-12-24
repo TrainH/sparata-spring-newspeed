@@ -36,7 +36,7 @@ public class UserService {
 
     public void softDeleteUser(DeletionRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("계정이 존재하지 않습니다."));
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
             user.updateIsDeleted(true);
             userRepository.save(user);
@@ -47,12 +47,16 @@ public class UserService {
 
     public Long getUserId(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserNotFoundException("계정이 존재하지 않습니다."));
+
+        if(user.isDeleted()){
+            throw new LoginException("계정은 이미 삭제 되었습니다.");
+        }
 
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
             return user.getUserId();
         } else {
-            throw new LoginException("비밀먼호가 일치하지 않습니다.");
+            throw new LoginException("비밀번호가 일치하지 않습니다.");
         }
     }
 }
