@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
+import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -15,18 +16,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class CommentDto {
     private Long commentId;
-    private Long userId;
     private Long postId;
-    private String userName;
+    private UserDto user;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
     public CommentDto(Comment comment) {
         this.commentId = comment.getId();
-        this.userId = comment.getUser().getUserId();
         this.postId = comment.getPost().getId();
-        this.userName = comment.getUser().getUserName();
+        this.user = UserDto.convertDto(comment.getUser());
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getUpdatedAt();
