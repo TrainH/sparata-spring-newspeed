@@ -47,8 +47,9 @@ public class UserController {
         return new ResponseEntity<>("로그아웃 성공했습니다.",HttpStatus.OK);
     }
 
-    @PostMapping("/{userId}/profile")
-    public ResponseEntity<ProfileResponse> createProfile(@PathVariable Long userId){
+    @PostMapping("/profile")
+    public ResponseEntity<ProfileResponse> createProfile(HttpSession session){
+        Long userId = (Long) session.getAttribute("userId");
 
         ProfileResponse profile = userService.createProfile(userId);
 
