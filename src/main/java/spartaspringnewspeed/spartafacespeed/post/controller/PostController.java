@@ -65,7 +65,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @RequestParam Long userIdfromParam) {
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         Long userId = (Long) session.getAttribute("userId");
         postService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
