@@ -5,26 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table
-        /*(uniqueConstraints ={
+@Table(uniqueConstraints ={
         @UniqueConstraint(name = "user_like_post",
         columnNames = {
                 "user_id",
                 "post_id"
         })
-})*/
+})
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Like {
+public class Liking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id",nullable=false)
     private User user;
 
     @ManyToOne
