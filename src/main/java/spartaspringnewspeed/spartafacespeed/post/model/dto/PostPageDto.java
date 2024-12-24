@@ -26,7 +26,7 @@ public class PostPageDto {
     public static PostPageDto fromPage(org.springframework.data.domain.Page<PostDto> postPage) {
         return new PostPageDto(
                 postPage.getContent(),
-                postPage.getNumber(),
+                postPage.getNumber()+1,
                 postPage.getSize(),
                 postPage.getTotalPages(),
                 postPage.getTotalElements()
