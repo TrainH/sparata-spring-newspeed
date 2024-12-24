@@ -72,19 +72,7 @@ public class FriendService {
         Friend requestedFriend = friendRepository.findByRequesterAndReceiverAndStatus(originalRequester, originalReceiver, FriendshipStatus.PENDING)
                 .orElseThrow(() -> new Exception("Friend Relationship not found"));
 
-        switch (status) {
-            case ACCEPTED:
-                requestedFriend.setStatus(FriendshipStatus.ACCEPTED);
-                break;
-            case DECLINED:
-                requestedFriend.setStatus(FriendshipStatus.DECLINED);
-                break;
-            case PENDING:
-                break;
-            default:
-                return;
-
-        }
+        requestedFriend.setStatus(status);
 
         friendRepository.save(requestedFriend);
     }
