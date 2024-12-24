@@ -15,6 +15,8 @@ import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository
 import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
 import spartaspringnewspeed.spartafacespeed.common.entity.Post;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.common.exception.IdValidationNotFoundException;
+import spartaspringnewspeed.spartafacespeed.common.exception.NotOwnerActionException;
 import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
@@ -94,13 +96,13 @@ public class CommentService {
         Comment comment = commentRepository.findByIdOrElseThrow(commentId);
 
         if (!comment.getPost().getId().equals(postId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist post id = " + postId);
+            throw new IdValidationNotFoundException(postId);
         }
 
         User user = userRepository.findByUserIdOrElseThrow(comment.getUser().getUserId());
 
         if (!user.getUserId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You are not allowed this comment.");
+            throw new NotOwnerActionException();
         }
         return comment;
     }

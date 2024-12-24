@@ -30,8 +30,8 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId, @RequestParam(defaultValue = "5") int pageSize, @RequestParam(defaultValue = "1") int pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page) {
+        Pageable pageable = PageRequest.of(page - 1, size);
         return new ResponseEntity<>(commentService.getCommentsByPostId(postId, pageable), HttpStatus.OK);
     }
 

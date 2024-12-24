@@ -21,4 +21,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(IdValidationNotFoundException.class)
+    public ResponseEntity<String> handleIdValidationNotFoundException(IdValidationNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotOwnerActionException.class)
+    public ResponseEntity<String> handleNotOwnerActionException(NotOwnerActionException exception) {
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+
+
 }
