@@ -27,5 +27,4 @@ public interface LikingPostRepository extends JpaRepository<LikingPost, Long> {
     long countLikesByPostId(@Param("postId") Long postId);
 
 
-
 }
