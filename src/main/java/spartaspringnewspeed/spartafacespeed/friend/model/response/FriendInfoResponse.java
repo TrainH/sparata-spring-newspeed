@@ -8,8 +8,6 @@ public class FriendInfoResponse {
     private String username;
     private String email;
 
-    // 필요한 필드들을 추가할 수 있습니다.
-
     public FriendInfoResponse(Long friendId, String username, String email) {
         this.friendId = friendId;
         this.username = username;

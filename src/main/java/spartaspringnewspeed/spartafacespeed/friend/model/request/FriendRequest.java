@@ -7,6 +7,9 @@ import lombok.Data;
 public class FriendRequest {
 
     @NotNull
+    private Long requesterId;
+
+    @NotNull
     private Long receiverId; // 친구 요청을 받을 사용자 ID
 
     @NotNull
