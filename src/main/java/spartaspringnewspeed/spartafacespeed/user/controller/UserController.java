@@ -7,10 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
-import spartaspringnewspeed.spartafacespeed.user.model.request.DeletionRequest;
-import spartaspringnewspeed.spartafacespeed.user.model.request.LoginRequest;
-import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
+import spartaspringnewspeed.spartafacespeed.user.model.request.*;
+import spartaspringnewspeed.spartafacespeed.user.model.response.ProfileResponse;
 import spartaspringnewspeed.spartafacespeed.user.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,4 +47,45 @@ public class UserController {
         session.invalidate();
         return new ResponseEntity<>("로그아웃 성공했습니다.",HttpStatus.OK);
     }
+
+    @PostMapping("/profile")
+    public ResponseEntity<ProfileResponse> createProfile(HttpSession session){
+        Long userId = (Long) session.getAttribute("userId");
+
+        ProfileResponse profile = userService.createProfile(userId);
+
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/profiles")
+    public ResponseEntity<List<ProfileResponse>> findAllProfiles() {
+
+        List<ProfileResponse> allProfiles = userService.findAllProfiles();
+
+        return new ResponseEntity<>(allProfiles, HttpStatus.OK);
+    }
+
+    @GetMapping("/profiles/search")
+    public ResponseEntity<List<ProfileResponse>> searchProfile(@RequestParam String profileName, @RequestParam String profileEmail) {
+
+        List<ProfileResponse> ProfileResponse = userService.searchProfile(profileName, profileEmail);
+
+        return new ResponseEntity<>(ProfileResponse, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{userId}/updateProfile")
+    public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId,@RequestBody ProfileRequest dto) {
+
+        ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
+
+        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{userId}/updatePassword")
+    public ResponseEntity<ProfileResponse> updatePassword(@PathVariable Long userId,@RequestBody PasswordRequest dto) {
+        userService.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

@@ -27,9 +27,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Profile profile;
-
     private boolean isDeleted;
 
     public User(String userName, String email, String password) {
@@ -44,6 +41,15 @@ public class User extends BaseEntity {
 
     public void updateIsDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
+    }
+
+    public void updateProfile(String profileName, String profileEmail) {
+        this.userName = profileName;
+        this.email = profileEmail;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
 }
