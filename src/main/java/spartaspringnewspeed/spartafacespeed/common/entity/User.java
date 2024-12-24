@@ -43,8 +43,8 @@ public class User extends BaseEntity {
         return new User(null, request.userName(), request.email(), encodePassword, isDeleted);
     }
 
-    public void updateDeletionStatus(boolean status) {
-        this.isDeleted = status;
+    public void updateIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
 }

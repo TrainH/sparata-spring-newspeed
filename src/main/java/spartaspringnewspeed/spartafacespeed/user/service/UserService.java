@@ -9,6 +9,7 @@ import spartaspringnewspeed.spartafacespeed.common.exception.LoginException;
 import spartaspringnewspeed.spartafacespeed.common.exception.ValidateException;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 import spartaspringnewspeed.spartafacespeed.user.model.request.DeletionRequest;
+import spartaspringnewspeed.spartafacespeed.user.model.request.LoginRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
@@ -21,8 +22,8 @@ public class UserService {
 
     public UserDto createUser(SignUpRequest request) {
         String encodePassword = passwordEncoder.encode(request.password());
-        boolean validate = userRepository.existsByEmail(request.email());
-        if(validate) {
+        boolean isEmailExists = userRepository.existsByEmail(request.email());
+        if(isEmailExists) {
             throw new ValidateException("이미 존재하는 이메일입니다.", HttpStatus.CONFLICT);
         }
         User user = User.createUser(request, encodePassword, false); // isDeleted 처음에 false
@@ -33,11 +34,19 @@ public class UserService {
     public void softDeleteUser(DeletionRequest request) {
         User user = userRepository.findByEmail(request.email());
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
-            user.updateDeletionStatus(true);
+            user.updateIsDeleted(true);
             userRepository.save(user);
         } else {
             throw new LoginException("비밀번호가 일치하지 않습니다.");
         }
     }
 
+    public Long getUserId(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email());
+        if(passwordEncoder.matches(request.password(), user.getPassword())) {
+            return user.getUserId();
+        } else {
+            throw new LoginException("비밀먼호가 일치하지 않습니다.");
+        }
+    }
 }
