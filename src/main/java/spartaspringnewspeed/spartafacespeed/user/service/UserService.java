@@ -6,12 +6,15 @@ import org.springframework.stereotype.Service;
 import spartaspringnewspeed.spartafacespeed.common.config.encode.PasswordEncoder;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
 import spartaspringnewspeed.spartafacespeed.common.exception.LoginException;
+import spartaspringnewspeed.spartafacespeed.common.exception.UserNotFoundException;
 import spartaspringnewspeed.spartafacespeed.common.exception.ValidateException;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 import spartaspringnewspeed.spartafacespeed.user.model.request.DeletionRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.request.LoginRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +35,8 @@ public class UserService {
     }
 
     public void softDeleteUser(DeletionRequest request) {
-        User user = userRepository.findByEmail(request.email());
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException("계정이 존재하지 않습니다."));
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
             user.updateIsDeleted(true);
             userRepository.save(user);
@@ -42,11 +46,17 @@ public class UserService {
     }
 
     public Long getUserId(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email());
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException("계정이 존재하지 않습니다."));
+
+        if(user.isDeleted()){
+            throw new LoginException("계정은 이미 삭제 되었습니다.");
+        }
+
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
             return user.getUserId();
         } else {
-            throw new LoginException("비밀먼호가 일치하지 않습니다.");
+            throw new LoginException("비밀번호가 일치하지 않습니다.");
         }
     }
 }
