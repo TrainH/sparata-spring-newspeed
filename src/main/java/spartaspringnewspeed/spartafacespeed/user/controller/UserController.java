@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import spartaspringnewspeed.spartafacespeed.common.entity.User;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 import spartaspringnewspeed.spartafacespeed.user.model.request.ProfileRequest;
 import spartaspringnewspeed.spartafacespeed.user.model.response.ProfileResponse;
 import spartaspringnewspeed.spartafacespeed.user.model.response.UserResponse;
 import spartaspringnewspeed.spartafacespeed.user.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,15 +35,17 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/profile")
-    public ResponseEntity<UserResponse> createProfile(@PathVariable Long userId){
-        User user = userService.createProfile(userId);
+    public ResponseEntity<ProfileResponse> createProfile(@PathVariable Long userId){
 
-        UserResponse userResponse = new UserResponse(user);
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        ProfileResponse profile = userService.createProfile(userId);
+
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+
     }
 
     @GetMapping("/profiles")
     public ResponseEntity<List<ProfileResponse>> findAllProfiles() {
+
         List<ProfileResponse> allProfiles = userService.findAllProfiles();
 
         return new ResponseEntity<>(allProfiles, HttpStatus.OK);
@@ -53,6 +53,7 @@ public class UserController {
 
     @GetMapping("/profiles/search")
     public ResponseEntity<List<ProfileResponse>> searchProfile(@RequestParam String profileName, @RequestParam String profileEmail) {
+
         List<ProfileResponse> ProfileResponse = userService.searchProfile(profileName, profileEmail);
 
         return new ResponseEntity<>(ProfileResponse, HttpStatus.OK);
@@ -60,7 +61,9 @@ public class UserController {
 
     @PatchMapping("/{userId}/updateProfile")
     public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId,@RequestBody ProfileRequest dto) {
+
         ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
+
         return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 

@@ -1,7 +1,7 @@
 package spartaspringnewspeed.spartafacespeed.user.model.request;
 
 import lombok.Getter;
-import lombok.Setter;
+
 
 @Getter
 public class ProfileRequest {

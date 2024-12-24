@@ -22,6 +22,7 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
+
     public UserResponse createUser (String userName, String email ,String password) {
         User user = new User(userName, email, password);
         User newUser = userRepository.save(user);
@@ -29,30 +30,27 @@ public class UserService {
         return new UserResponse(newUser.getUserId(), newUser.getUserName(), newUser.getEmail());
     }
 
+
     public List<UserResponse> getAllUsers(){
-//        List<User> users = new ArrayList<>();
-//
-//        for(User user : userRepository.findAll()){
-//            users.add(user);
-//        }
-//
-//        return  List<UserResponse> (users);
-//        return new UserResponse(users.get(0).getUserId(), users.get(0).getUserName(), users.get(0).getEmail());
-//        List<User> users = userRepository.findAll();
+
         return userRepository.findAll().stream().map(UserResponse::toDto).toList();
     }
 
-    public User createProfile(Long userId){
+
+    public ProfileResponse createProfile(Long userId){
 
         User user = userRepository.findByUserIdOrElseThrow(userId);
 
-        user.Profile(user.getUserName(), user.getEmail());
-        return userRepository.save(user);
+        return new ProfileResponse(userId, user.getUserName(), user.getEmail());
     }
 
     public List<ProfileResponse> findAllProfiles(){
-        return userRepository.findAll().stream().map(ProfileResponse::toDto).toList();
+
+        List<User> users = userRepository.findAll();
+
+        return users.stream().map(ProfileResponse::toDto).toList();
     }
+
 
     public List<ProfileResponse> searchProfile(String ProfileName, String ProfileEmail){
         List<User> users = userRepository.findAll();
@@ -63,7 +61,7 @@ public class UserService {
         }
 
         for(User user : users){
-            if(user.getProfileName().equals(ProfileName) || user.getProfileEmail().equals(ProfileEmail)){
+            if(user.getUserName().equals(ProfileName) || user.getEmail().equals(ProfileEmail)){
                 responseList.add(new ProfileResponse(user.getUserId(), user.getUserName(), user.getEmail()));
             }
 
@@ -71,11 +69,15 @@ public class UserService {
         return responseList;
     }
 
+
     public ProfileResponse updateProfile(Long userId, String profileName, String profileEmail){
+
         User user = userRepository.findByUserIdOrElseThrow(userId);
-        if(user.getProfileEmail().equals(profileEmail)){
+
+        if(user.getEmail().equals(profileEmail)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
         }
+
         user.updateProfile(profileName,profileEmail);
         userRepository.save(user);
 

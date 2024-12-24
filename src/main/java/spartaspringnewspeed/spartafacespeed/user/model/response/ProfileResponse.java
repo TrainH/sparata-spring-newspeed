@@ -19,8 +19,9 @@ public class ProfileResponse {
         this.profileEmail = profileEmail;
     }
 
-    public static ProfileResponse toDto(User user) {
+        public static ProfileResponse toDto(User user) {
 
-        return new ProfileResponse(user.getUserId(), user.getProfileName(), user.getProfileEmail());
+        return new ProfileResponse(user.getUserId(), user.getUserName(), user.getEmail());
     }
+
 }
