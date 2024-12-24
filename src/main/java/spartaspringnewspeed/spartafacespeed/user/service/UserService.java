@@ -116,7 +116,6 @@ public class UserService {
         }
 
 
-//        user.updateProfile(profileName,profileEmail);
         userRepository.save(user);
 
         return new ProfileResponse(user.getUserId(), user.getUserName(), user.getEmail());
