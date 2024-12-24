@@ -96,6 +96,11 @@ public class FriendService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteFriend(Long userId, Long friendId) throws Exception { // 친구 관계 등록된 번호로 삭제하기
+
+        friendRepository.deleteById(friendId);
+    }
+
     private FriendInfoResponse convertToFriendInfoResponse(Friend friend, User currentUser) {
         User otherUser;
 
