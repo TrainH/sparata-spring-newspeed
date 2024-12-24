@@ -102,11 +102,20 @@ public class UserService {
 
         User user = userRepository.findByUserIdOrElseThrow(userId);
 
-        if(user.getEmail().equals(profileEmail)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+        if(profileEmail != null && !profileEmail.isEmpty()) {
+            if (user.getEmail().equals(profileEmail)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+            }
+
+            user.updateProfileEmail(profileEmail);
+
         }
 
-        user.updateProfile(profileName,profileEmail);
+        if (profileName != null && !profileName.isEmpty()) {
+            user.updateProfileName(profileName);
+        }
+
+
         userRepository.save(user);
 
         return new ProfileResponse(user.getUserId(), user.getUserName(), user.getEmail());
