@@ -2,18 +2,24 @@ package spartaspringnewspeed.spartafacespeed.friend.controller;
 
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.*;
+import spartaspringnewspeed.spartafacespeed.common.entity.FriendshipStatus;
 import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendRequest;
+import spartaspringnewspeed.spartafacespeed.friend.model.request.TestUserRequest;
+import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendInfoResponse;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendResponse;
 import spartaspringnewspeed.spartafacespeed.friend.service.FriendService;
 
 import java.util.List;
 
-@Controller
+@Slf4j
+@RestController
 @RequestMapping("/friends")
 public class FriendController {
 
@@ -22,83 +28,62 @@ public class FriendController {
 
     // 친구 요청 페이지 이동
     @GetMapping("/request")
-    public String showFriendRequestForm(Model model) {
-        model.addAttribute("friendRequestDTO", new FriendRequest());
-        return "friends/requestFriend";
+    public ResponseEntity<FriendRequest> showFriendRequestForm() {
+        FriendRequest friendRequest = new FriendRequest();
+        return ResponseEntity.ok(friendRequest);
     }
 
     // 친구 요청 처리
     @PostMapping("/request")
-    public String sendFriendRequest(@Valid @ModelAttribute FriendRequest friendRequestDTO,
-                                    BindingResult bindingResult,
-                                    @SessionAttribute("userId") Long userId,
-                                    Model model) {
-
+    public ResponseEntity<String> sendFriendRequest(@Valid @RequestBody FriendRequest friendRequestDTO,
+                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "friends/requestFriend";
+            return ResponseEntity.badRequest().body("Validation errors occurred: " + bindingResult.getAllErrors());
         }
 
         try {
-            friendService.sendFriendRequest(userId, friendRequestDTO);
-            model.addAttribute("successMessage", "Friend request sent successfully");
-            return "redirect:/friends/requests";
+            friendService.sendFriendRequest(friendRequestDTO.getRequesterId(), friendRequestDTO.getReceiverId());
+            return ResponseEntity.status(HttpStatus.CREATED).body("Friend request sent successfully");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "friends/requestFriend";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail: " + e.getMessage());
         }
     }
 
     // 받은 친구 요청 목록
     @GetMapping("/requests")
-    public String viewFriendRequests(@SessionAttribute("userId") Long userId, Model model) {
+    public ResponseEntity<?> viewFriendRequests(@RequestParam("receiverId") Long receiverId) {
         try {
-            List<FriendResponse> pendingRequests = friendService.getPendingFriendRequests(userId);
-            model.addAttribute("pendingRequests", pendingRequests);
-            return "friends/friendRequests";
+            List<FriendResponse> pendingRequests = friendService.getPendingFriendRequests(receiverId);
+            return ResponseEntity.ok(pendingRequests);
         } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 
-    // 친구 요청 수락
-    @PostMapping("/requests/{id}/accept")
-    public String acceptFriendRequest(@SessionAttribute("userId") Long userId,
-                                      @PathVariable("id") Long friendRequestId,
-                                      Model model) {
+    // 친구 요청 변경
+    @PostMapping("/requests/{id}/{status}")
+    public ResponseEntity<String> acceptFriendRequest(@PathVariable("id") Long id,
+                                                      @PathVariable("status") FriendshipStatus status,
+                                                      @RequestParam("originalRequesterId") Long originalRequesterId) {
+        log.info(status.toString());
         try {
-            friendService.acceptFriendRequest(userId, friendRequestId);
-            return "redirect:/friends/requests";
+            friendService.confirmFriendRequest(id, originalRequesterId, status);
+            return ResponseEntity.ok("Friend request accepted");
         } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 
-    // 친구 요청 거절
-    @PostMapping("/requests/{id}/decline")
-    public String declineFriendRequest(@SessionAttribute("userId") Long userId,
-                                       @PathVariable("id") Long friendRequestId,
-                                       Model model) {
-        try {
-            friendService.declineFriendRequest(userId, friendRequestId);
-            return "redirect:/friends/requests";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error";
-        }
-    }
 
     // 친구 목록 페이지
-    @GetMapping("/list")
-    public String listFriends(@SessionAttribute("userId") Long userId, Model model) {
+    @GetMapping("")
+    public ResponseEntity<?> getFriends(@RequestParam("id") Long receiverId) {
         try {
-            List<FriendResponse> friends = friendService.getFriendsList(userId);
-            model.addAttribute("friends", friends);
-            return "friends/list";
+            List<FriendInfoResponse> friends = friendService.getFriendsList(receiverId);
+            return ResponseEntity.ok(friends);
         } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "error";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
+
 }
