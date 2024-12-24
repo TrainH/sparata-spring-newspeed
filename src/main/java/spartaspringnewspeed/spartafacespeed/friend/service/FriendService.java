@@ -6,13 +6,15 @@ import org.springframework.transaction.annotation.Transactional;
 import spartaspringnewspeed.spartafacespeed.common.entity.Friend;
 import spartaspringnewspeed.spartafacespeed.common.entity.FriendshipStatus;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
-import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendRequest;
+import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendInfoResponse;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendResponse;
 import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,11 +27,11 @@ public class FriendService {
     private UserRepository userRepository;
 
     @Transactional
-    public void sendFriendRequest(Long requesterId, FriendRequest friendRequestDTO) throws Exception {
+    public void sendFriendRequest(Long requesterId, Long receiverId) throws Exception {
         User requester = userRepository.findById(requesterId)
                 .orElseThrow(() -> new Exception("Requester not found"));
 
-        User receiver = userRepository.findById(friendRequestDTO.getReceiverId())
+        User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new Exception("Receiver not found"));
 
         // 자기 자신에게 친구 요청 불가
@@ -53,30 +55,19 @@ public class FriendService {
     }
 
     @Transactional
-    public void acceptFriendRequest(Long receiverId, Long friendRequestId) throws Exception {
-        Friend friendRequest = friendRepository.findById(friendRequestId)
-                .orElseThrow(() -> new Exception("Friend request not found"));
+    public void confirmFriendRequest(Long originalReceiverId, Long originalRequesterId, FriendshipStatus status) throws Exception {
+        User originalRequester = userRepository.findByUserId(originalRequesterId)
+                .orElseThrow(() -> new Exception("Requester not found"));
+        User originalReceiver = userRepository.findByUserId(originalReceiverId)
+                .orElseThrow(() -> new Exception("Requester not found"));
+        Friend requestedFriend = friendRepository.findByRequesterAndReceiverAndStatus(originalRequester, originalReceiver, FriendshipStatus.PENDING)
+                .orElseThrow(() -> new Exception("Friend Relationship not found"));
 
-        if (!friendRequest.getReceiver().getUserId().equals(receiverId)) {
-            throw new Exception("Unauthorized");
-        }
+        requestedFriend.setStatus(status);
 
-        friendRequest.accept();
-        friendRepository.save(friendRequest);
+        friendRepository.save(requestedFriend);
     }
 
-    @Transactional
-    public void declineFriendRequest(Long receiverId, Long friendRequestId) throws Exception {
-        Friend friendRequest = friendRepository.findById(friendRequestId)
-                .orElseThrow(() -> new Exception("Friend request not found"));
-
-        if (!friendRequest.getReceiver().getUserId().equals(receiverId)) {
-            throw new Exception("Unauthorized");
-        }
-
-        friendRequest.decline();
-        friendRepository.save(friendRequest);
-    }
 
     public List<FriendResponse> getPendingFriendRequests(Long userId) throws Exception {
         User user = userRepository.findById(userId)
@@ -87,13 +78,36 @@ public class FriendService {
         return pendingRequests.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    public List<FriendResponse> getFriendsList(Long userId) throws Exception {
+    public List<FriendInfoResponse> getFriendsList(Long userId) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("User not found"));
 
-        List<Friend> acceptedFriends = friendRepository.findByRequesterAndStatus(user, FriendshipStatus.ACCEPTED);
+        List<Friend> requesterFriends = friendRepository.findByRequesterAndStatus(user, FriendshipStatus.ACCEPTED);
+        List<Friend> receiverFriends = friendRepository.findByReceiverAndStatus(user, FriendshipStatus.ACCEPTED);
 
-        return acceptedFriends.stream().map(this::convertToDTO).collect(Collectors.toList());
+        List<Friend> allFriends = new ArrayList<>();
+        allFriends.addAll(requesterFriends);
+        allFriends.addAll(receiverFriends);
+
+        return allFriends.stream()
+                .map(friend -> convertToFriendInfoResponse(friend, user))
+                .collect(Collectors.toList());
+    }
+
+    private FriendInfoResponse convertToFriendInfoResponse(Friend friend, User currentUser) {
+        User otherUser;
+
+        if (friend.getRequester().equals(currentUser)) {
+            otherUser = friend.getReceiver();
+        } else {
+            otherUser = friend.getRequester();
+        }
+
+        return new FriendInfoResponse(
+                otherUser.getUserId(),
+                otherUser.getUserName(),
+                otherUser.getEmail()
+        );
     }
 
     private FriendResponse convertToDTO(Friend friend) {
