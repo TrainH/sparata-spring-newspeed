@@ -76,9 +76,8 @@ public class FriendController {
 
 
     // 친구 목록 페이지
-    // 친구 목록 페이지
     @GetMapping("")
-    public ResponseEntity<?> listFriends(@RequestParam("id") Long receiverId) {
+    public ResponseEntity<?> getFriends(@RequestParam("id") Long receiverId) {
         try {
             List<FriendInfoResponse> friends = friendService.getFriendsList(receiverId);
             return ResponseEntity.ok(friends);
