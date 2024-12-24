@@ -54,7 +54,7 @@ public class FriendController {
 
 
     // 받은 친구 요청 목록
-    @GetMapping("/requests")
+    @GetMapping("/requests/pending")
     public ResponseEntity<?> viewFriendRequests(HttpSession session) {
         try {
             Long receiverId = (Long) session.getAttribute("userId");
