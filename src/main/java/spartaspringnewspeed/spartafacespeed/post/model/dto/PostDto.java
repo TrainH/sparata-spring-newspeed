@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import spartaspringnewspeed.spartafacespeed.common.entity.Post;
+import spartaspringnewspeed.spartafacespeed.user.controller.UserController;
 
 @Getter
 @Setter
@@ -19,6 +20,7 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
     public PostDto(Post post) {
         this.id = post.getId();
         this.content = post.getContent();
@@ -26,6 +28,5 @@ public class PostDto {
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
     }
-
 
 }

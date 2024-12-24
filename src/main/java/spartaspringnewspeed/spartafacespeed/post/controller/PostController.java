@@ -48,9 +48,7 @@ public class PostController {
         return ResponseEntity.ok(postPageDto);
     }
 
-
-
-
+    //게시물 단건조회
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponse> getPost(@PathVariable Long postId) {
         PostResponse postResponse = postService.getPostById(postId);

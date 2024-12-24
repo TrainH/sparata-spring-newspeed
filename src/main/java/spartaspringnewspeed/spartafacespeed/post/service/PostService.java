@@ -6,7 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository;
+import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.liking.repository.PostLikeRepository;
 import spartaspringnewspeed.spartafacespeed.post.model.request.CreatePostRequest;
 import spartaspringnewspeed.spartafacespeed.post.model.request.UpdatePostRequest;
 import spartaspringnewspeed.spartafacespeed.post.model.response.PostResponse;
@@ -29,12 +32,16 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, PostLikeRepository postLikeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
+        this.postLikeRepository = postLikeRepository;
     }
 
     //게시물 등록
@@ -65,7 +72,12 @@ public class PostService {
     public PostResponse getPostById(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
-        return new PostResponse(post);
+        long commentCount = commentRepository.countByPost_Id(postId);
+        long likeCount = postLikeRepository.countByPost_Id(postId);
+
+        PostDto postDto = new PostDto(post);
+
+        return new PostResponse(postDto, commentCount, likeCount);
     }
 
     //게시물 수정
