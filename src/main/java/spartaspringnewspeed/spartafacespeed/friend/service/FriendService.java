@@ -13,6 +13,7 @@ import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,9 +40,10 @@ public class FriendService {
             throw new Exception("Cannot send friend request to yourself");
         }
 
-        // 이미 친구 요청이 있거나 친구인 경우 확인
-        if (friendRepository.existsByRequesterAndReceiverAndStatus(requester, receiver, FriendshipStatus.PENDING) ||
-                friendRepository.existsByRequesterAndReceiverAndStatus(requester, receiver, FriendshipStatus.ACCEPTED)) {
+        // 이미 친구 요청이 있거나 친구인 경우 확인 (양방향 검사)
+        List<FriendshipStatus> statusesToCheck = Arrays.asList(FriendshipStatus.PENDING, FriendshipStatus.ACCEPTED);
+
+        if (friendRepository.existsFriendshipBetweenUsers(requester, receiver, statusesToCheck)) {
             throw new Exception("Friend request already sent or already friends");
         }
 
