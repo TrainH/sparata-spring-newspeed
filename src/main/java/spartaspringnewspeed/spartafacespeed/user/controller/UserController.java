@@ -20,15 +20,16 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody SignUpRequest request) {
-        return new ResponseEntity<>(userService.createUser(request), HttpStatus.OK);
+    public ResponseEntity<String> createUser(@Valid @RequestBody SignUpRequest request) {
+        userService.createUser(request);
+        return new ResponseEntity<>(" 등록되었습니다. ", HttpStatus.CREATED);
     }
 
     @PatchMapping("/deletion")
-    public ResponseEntity<UserDto> softDeleteUser(@Valid @RequestBody DeletionRequest request, HttpSession session) {
+    public ResponseEntity<String> softDeleteUser(@Valid @RequestBody DeletionRequest request, HttpSession session) {
         userService.softDeleteUser(request);
         session.invalidate();
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("삭제 되었습니다. ", HttpStatus.OK);
     }
 
     @PostMapping("/login")

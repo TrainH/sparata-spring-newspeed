@@ -1,6 +1,7 @@
 package spartaspringnewspeed.spartafacespeed.friend.controller;
 
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,15 @@ public class FriendController {
 
     // 친구 요청 처리
     @PostMapping("/request")
-    public ResponseEntity<String> sendFriendRequest(@Valid @RequestBody FriendRequest friendRequestDTO,
-                                                    BindingResult bindingResult) {
+    public ResponseEntity<String> sendFriendRequest(@Valid @RequestBody FriendRequest friendRequestDTO, BindingResult bindingResult, HttpSession session)
+    {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("Validation errors occurred: " + bindingResult.getAllErrors());
         }
 
         try {
-            friendService.sendFriendRequest(friendRequestDTO.getRequesterId(), friendRequestDTO.getReceiverId());
+            Long requesterId = (Long) session.getAttribute("userId");
+            friendService.sendFriendRequest(requesterId, friendRequestDTO.getReceiverId());
             return ResponseEntity.status(HttpStatus.CREATED).body("Friend request sent successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail: " + e.getMessage());
@@ -51,8 +53,9 @@ public class FriendController {
 
     // 받은 친구 요청 목록
     @GetMapping("/requests")
-    public ResponseEntity<?> viewFriendRequests(@RequestParam("receiverId") Long receiverId) {
+    public ResponseEntity<?> viewFriendRequests(HttpSession session) {
         try {
+            Long receiverId = (Long) session.getAttribute("userId");
             List<FriendResponse> pendingRequests = friendService.getPendingFriendRequests(receiverId);
             return ResponseEntity.ok(pendingRequests);
         } catch (Exception e) {
@@ -61,14 +64,15 @@ public class FriendController {
     }
 
     // 친구 요청 변경
-    @PostMapping("/requests/{id}/{status}")
-    public ResponseEntity<String> acceptFriendRequest(@PathVariable("id") Long id,
-                                                      @PathVariable("status") FriendshipStatus status,
-                                                      @RequestParam("originalRequesterId") Long originalRequesterId) {
+    @PostMapping("/requests/")
+    public ResponseEntity<String> acceptFriendRequest(@RequestParam("status") FriendshipStatus status,
+                                                      @RequestParam("originalRequesterId") Long originalRequesterId,
+                                                      HttpSession session) {
         log.info(status.toString());
         try {
-            friendService.confirmFriendRequest(id, originalRequesterId, status);
-            return ResponseEntity.ok("Friend request accepted");
+            Long userId = (Long) session.getAttribute("userId");
+            friendService.confirmFriendRequest(userId, originalRequesterId, status);
+            return ResponseEntity.ok("Friend request changed");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
@@ -77,9 +81,10 @@ public class FriendController {
 
     // 친구 목록 페이지
     @GetMapping("")
-    public ResponseEntity<?> getFriends(@RequestParam("id") Long receiverId) {
+    public ResponseEntity<?> getFriends(HttpSession session) {
         try {
-            List<FriendInfoResponse> friends = friendService.getFriendsList(receiverId);
+            Long userId = (Long) session.getAttribute("userId");
+            List<FriendInfoResponse> friends = friendService.getFriendsList(userId);
             return ResponseEntity.ok(friends);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
