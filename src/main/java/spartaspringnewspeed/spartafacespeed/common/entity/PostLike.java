@@ -14,9 +14,8 @@ import lombok.NoArgsConstructor;
 })
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
-public class LikingPost {
+public class PostLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +28,9 @@ public class LikingPost {
     @ManyToOne
     @JoinColumn(name = "post_id",nullable = false)
     private Post post;
+
+    public PostLike(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
 }
