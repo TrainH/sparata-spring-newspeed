@@ -22,5 +22,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "ORDER BY c.createdAt DESC")
     Page<CommentPagingDto> findAllByPostIdWithCount(@Param("postId") Long postId, Pageable pageable);
 
+    long countByPost_Id(Long id);
+
 }
 
