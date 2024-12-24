@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 })
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 public class PostLike {
 
@@ -29,4 +28,9 @@ public class PostLike {
     @ManyToOne
     @JoinColumn(name = "post_id",nullable = false)
     private Post post;
+
+    public PostLike(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
 }

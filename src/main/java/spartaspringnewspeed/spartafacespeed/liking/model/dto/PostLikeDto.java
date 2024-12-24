@@ -1,6 +1,10 @@
 package spartaspringnewspeed.spartafacespeed.liking.model.dto;
 
-public class PostLikeDto {
-    long count;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+public class PostLikeDto {
+    boolean likeStatus;
 }

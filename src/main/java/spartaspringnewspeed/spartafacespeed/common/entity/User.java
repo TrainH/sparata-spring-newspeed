@@ -9,7 +9,6 @@ import spartaspringnewspeed.spartafacespeed.user.model.request.SignUpRequest;
 
 @Entity
 @Getter
-@Setter // 테스트용
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
