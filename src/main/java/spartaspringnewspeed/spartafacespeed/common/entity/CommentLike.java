@@ -4,6 +4,8 @@ package spartaspringnewspeed.spartafacespeed.common.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Table(uniqueConstraints ={
     @UniqueConstraint(name = "user_like_comment",
@@ -27,6 +29,7 @@ public class CommentLike {
 
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Comment comment;
 
     public CommentLike(User user, Comment comment) {
