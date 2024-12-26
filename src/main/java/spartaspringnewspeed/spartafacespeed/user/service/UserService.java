@@ -1,6 +1,7 @@
 package spartaspringnewspeed.spartafacespeed.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -69,7 +70,7 @@ public class UserService {
         }
     }
 
-    public ProfileResponse createProfile(Long userId){
+    public ProfileResponse getMyProfile(Long userId){
 
         User user = userRepository.findByUserIdOrElseThrow(userId);
 
@@ -102,7 +103,6 @@ public class UserService {
             }
         }
 
-
         return responseList;
     }
 
@@ -121,9 +121,8 @@ public class UserService {
         }
 
         if (profileName != null && !profileName.isEmpty()) {
-            user.updateProfileName(profileName);
-        }
-
+                user.updateProfileName(profileName);
+            }
 
         userRepository.save(user);
 
