@@ -8,7 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import spartaspringnewspeed.spartafacespeed.common.entity.Post;
 import spartaspringnewspeed.spartafacespeed.common.entity.PostLike;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
-import spartaspringnewspeed.spartafacespeed.liking.model.dto.PostLikeDto;
 import spartaspringnewspeed.spartafacespeed.liking.repository.PostLikeRepository;
 import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;

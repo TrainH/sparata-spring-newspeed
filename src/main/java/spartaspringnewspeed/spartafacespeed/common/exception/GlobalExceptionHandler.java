@@ -32,5 +32,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(CannotLikeOwnContentException.class)
+    public ResponseEntity<String> handleCannotLikeOwnContentException(CannotLikeOwnContentException exception) {
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+
 
 }

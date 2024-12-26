@@ -6,5 +6,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostLikeDto {
-    boolean likeStatus;
 }
