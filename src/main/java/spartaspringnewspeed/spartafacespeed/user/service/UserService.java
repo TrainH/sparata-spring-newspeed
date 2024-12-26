@@ -80,6 +80,10 @@ public class UserService {
 
         List<User> users = userRepository.findAll();
 
+        if(users.isEmpty()){
+            throw new ValidateException("유저를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+
         return users.stream().map(ProfileResponse::toDto).toList();
     }
 
@@ -89,7 +93,7 @@ public class UserService {
         List<ProfileResponse> responseList = new ArrayList<>();
 
         if(users.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다.");
+            throw new ValidateException("유저를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
 
         for(User user : users){
@@ -109,7 +113,7 @@ public class UserService {
 
         if(profileEmail != null && !profileEmail.isEmpty()) {
             if (user.getEmail().equals(profileEmail)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already in use");
+                throw new ValidateException("이미 있는 이메일 입니다.", HttpStatus.BAD_REQUEST);
             }
 
             user.updateProfileEmail(profileEmail);
@@ -131,7 +135,9 @@ public class UserService {
         User user = userRepository.findByUserIdOrElseThrow(userId);
 
         if(!passwordEncoder.matches(oldPassword, user.getPassword())){
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new ValidateException("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST);
+        }else if(passwordEncoder.matches(newPassword, user.getPassword())){
+            throw new ValidateException("현재 비밀번호로와 동일한 비밀번호로는 변경할 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
 
         String encodePassword = passwordEncoder.encode(newPassword);
