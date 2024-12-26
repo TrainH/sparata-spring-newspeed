@@ -49,11 +49,11 @@ public class UserController {
         return new ResponseEntity<>("로그아웃 성공했습니다.",HttpStatus.OK);
     }
 
-    @PostMapping("/profile")
-    public ResponseEntity<ProfileResponse> createProfile(HttpSession session){
+    @GetMapping("/myProfile")
+    public ResponseEntity<ProfileResponse> getMyProfile(HttpSession session){
         Long userId = (Long) session.getAttribute("userId");
 
-        ProfileResponse profile = userService.createProfile(userId);
+        ProfileResponse profile = userService.getMyProfile(userId);
 
         return new ResponseEntity<>(profile, HttpStatus.OK);
 
@@ -89,7 +89,8 @@ public class UserController {
     public ResponseEntity<String> updatePassword(@Valid@RequestBody PasswordRequest dto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         userService.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
-        return new ResponseEntity<>("비밀번호가 변경되었습니다.", HttpStatus.OK);
+        session.invalidate();
+        return new ResponseEntity<>("비밀번호가 변경되었습니다. 다시 로그인 해주세요.", HttpStatus.OK);
     }
 
 }
