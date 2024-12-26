@@ -11,9 +11,7 @@ import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendResponse
 import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -93,8 +91,10 @@ public class FriendService {
         return pendingRequests.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+
+
     @Transactional
-    public void confirmFriendRequest(Long requestId, Long myId) throws Exception {
+    public void accepteriendRequest(Long requestId, Long myId) throws Exception {
         User user = userRepository.findByUserIdOrElseThrow(myId);
 
         Friend requestedFriend = friendRepository.findByIdAndReceiverAndStatus(
@@ -123,6 +123,21 @@ public class FriendService {
         // Save both relationships
         friendRepository.save(requestedFriend);
         friendRepository.save(reverseFriend);
+    }
+
+    @Transactional
+    public void declineFriendRequest(Long requestId, Long myId) throws Exception {
+        User user = userRepository.findByUserIdOrElseThrow(myId);
+
+        Friend requestedFriend = friendRepository.findByIdAndReceiverAndStatus(
+                        requestId, user, FriendshipStatus.PENDING)
+                .orElseThrow(() -> new Exception("Friend request not found"));
+
+        // 친구 요청 상태를 DECLINED로 변경하거나 삭제합니다.
+        requestedFriend.setStatus(FriendshipStatus.DECLINED);
+        friendRepository.save(requestedFriend);
+
+        // 필요에 따라 추가 로직을 구현할 수 있습니다.
     }
 
 

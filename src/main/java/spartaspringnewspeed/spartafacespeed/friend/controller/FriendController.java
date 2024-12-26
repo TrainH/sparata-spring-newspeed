@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import spartaspringnewspeed.spartafacespeed.common.entity.FriendshipStatus;
 import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendDeleteRequest;
 import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendRequest;
+import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendUpdateRequest;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendInfoResponse;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendResponse;
 import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
@@ -33,8 +34,7 @@ public class FriendController {
 
     // 친구 요청 처리
     @PostMapping("/requests")
-    public ResponseEntity<String> sendFriendRequest(@Valid @RequestBody FriendRequest dto, BindingResult bindingResult, HttpSession session)
-    {
+    public ResponseEntity<String> sendFriendRequest(@Valid @RequestBody FriendRequest dto, BindingResult bindingResult, HttpSession session) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body("Validation errors occurred: " + bindingResult.getAllErrors());
         }
@@ -55,7 +55,7 @@ public class FriendController {
             Long receiverId = (Long) session.getAttribute("userId");
             List<FriendResponse> friendRequests = friendService.getPendingFriendRequests(receiverId);
             return ResponseEntity.ok(friendRequests);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -73,16 +73,34 @@ public class FriendController {
         }
     }
 
-    // 친구 요청을 '친구 요청 아이디 기반으로 변경'
+
+    // 친구 요청 상태 업데이트 (수락 또는 거절)
     @PatchMapping("/requests/{requestId}")
-    public ResponseEntity<String> acceptFriendRequest(@PathVariable Long requestId,
-                                                      HttpSession session) {
+    public ResponseEntity<String> updateFriendRequest(
+            @PathVariable Long requestId,
+            @Valid @RequestBody FriendUpdateRequest updateDto,
+            BindingResult bindingResult,
+            HttpSession session) {
+        if (bindingResult.hasErrors()) {
+            // 요청 데이터의 검증 오류 처리
+            return ResponseEntity.badRequest().body("Invalid request data");
+        }
         try {
             Long myId = (Long) session.getAttribute("userId");
-            friendService.confirmFriendRequest(requestId, myId);
-            return ResponseEntity.ok("Friend request changed");
+            String status = updateDto.getStatus();
+
+            if ("ACCEPTED".equalsIgnoreCase(status)) {
+                friendService.accepteriendRequest(requestId, myId);
+                return ResponseEntity.ok("Friend request accepted");
+            } else if ("DECLINED".equalsIgnoreCase(status)) {
+                friendService.declineFriendRequest(requestId, myId);
+                return ResponseEntity.ok("Friend request declined");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid status value");
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
         }
     }
 
@@ -99,12 +117,8 @@ public class FriendController {
         }
     }
 
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteFriend(@Valid @RequestBody FriendDeleteRequest dto, BindingResult bindingResult, HttpSession session) {
-        if (bindingResult.hasErrors()) {
-            // Handle validation errors
-            return ResponseEntity.badRequest().body("Invalid request data");
-        }
+    @DeleteMapping("/delete/{friendUserId}")
+    public ResponseEntity<String> deleteFriend(@PathVariable Long friendUserId, HttpSession session) {
 
         // Get the current user's ID from the session
         Long userId = (Long) session.getAttribute("userId");
@@ -115,7 +129,7 @@ public class FriendController {
 
         try {
             // Call the service method to mark the friend relationship as DELETED
-            friendService.deleteFriend(userId, dto.getFriendUserId());
+            friendService.deleteFriend(userId, friendUserId);
             return ResponseEntity.ok("Friend relationship has been deleted");
         } catch (Exception e) {
             // Handle exceptions and return an appropriate response
