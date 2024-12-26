@@ -12,13 +12,16 @@ import spartaspringnewspeed.spartafacespeed.comment.model.dto.CommentPagingDto;
 import spartaspringnewspeed.spartafacespeed.comment.model.request.CreateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.model.request.UpdateCommentRequest;
 import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository;
-import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
-import spartaspringnewspeed.spartafacespeed.common.entity.Post;
-import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.common.entity.*;
 import spartaspringnewspeed.spartafacespeed.common.exception.IdValidationNotFoundException;
+import spartaspringnewspeed.spartafacespeed.common.exception.NotFriendsException;
 import spartaspringnewspeed.spartafacespeed.common.exception.NotOwnerActionException;
+import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
 import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
 import spartaspringnewspeed.spartafacespeed.user.repository.UserRepository;
+
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
+    private final FriendRepository friendRepository;
 
     /**
      * 댓글 생성
@@ -40,6 +43,10 @@ public class CommentService {
     public CommentDto createComment(CreateCommentRequest request, long userId, long postId) {
         Post post = postRepository.findPostByIdOrThrow(postId);//댓글을 작성할 포스트 찾기
         User user = userRepository.findByUserIdOrElseThrow(userId);//댓글 작성 유저 찾기
+
+        //포스트를 작성한 유저의 친구
+        verifyFriends(post, userId);
+
 
         Comment saveComment = new Comment(request.getContent(), user, post); //해당 포스트에 입력할 댓글 만들기
 
@@ -55,11 +62,15 @@ public class CommentService {
      * @param pageable 페이지 객체
      * @return Page<CommentDto>
      */
-    public Page<CommentPagingDto> getCommentsByPostId(Long postId, Pageable pageable) {
+    public Page<CommentPagingDto> getCommentsByPostId(Long postId,Long userId, Pageable pageable) {
+        Post post = postRepository.findPostByIdOrThrow(postId);
+        verifyFriends(post, userId);
         return commentRepository.findByPostIdOrderByCreatedAtDesc(postId,pageable).map(CommentPagingDto::new);
     }
 
-    public Page<CommentPagingDto> getCommetsByPostIdOrderByLikeCount(Long postId, Pageable pageable) {
+    public Page<CommentPagingDto> getCommetsByPostIdOrderByLikeCount(Long postId, Long userId, Pageable pageable) {
+        Post post = postRepository.findPostByIdOrThrow(postId);
+        verifyFriends(post, userId);
         return commentRepository.findByPostIdOrderByLikeCountDescCreatedAtDesc(postId,pageable).map(CommentPagingDto::new);
     }
 
@@ -109,6 +120,31 @@ public class CommentService {
             throw new NotOwnerActionException();
         }
         return comment;
+    }
+
+
+    /**
+     * 친구 검증 메소드
+     * @param post 해당 포스트
+     * @param userId 현재 접속한 유저
+     */
+    private void verifyFriends(Post post, Long userId){//댓글을 작성할 포스트 찾기
+        if(post.getUser().getUserId().equals(userId)){
+            return;
+        }
+        //포스트를 작성한 유저의 친구 목록
+        List<Long> friend = friendRepository.findFriendUserIdsByUserIdAndStatus(userId, FriendshipStatus.ACCEPTED);
+
+        int cnt =0;
+        for(Long friendsId : friend) {
+            if(Objects.equals(friendsId, userId)){
+                cnt ++;
+                break;
+            }
+        }
+        if(cnt==0) {
+            throw new NotFriendsException("CommentService");
+        }
     }
 
 

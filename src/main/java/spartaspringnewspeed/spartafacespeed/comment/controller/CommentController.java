@@ -30,15 +30,17 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<Page<CommentPagingDto>> getComments(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
         Pageable pageable = PageRequest.of(page - 1, size);
-        return new ResponseEntity<>(commentService.getCommentsByPostId(postId, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.getCommentsByPostId(postId, userId,pageable), HttpStatus.OK);
     }
 
     @GetMapping("/{postId}/comments/order-likes")
-    public ResponseEntity<Page<CommentPagingDto>> getCommentsOrderByLikes(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<Page<CommentPagingDto>> getCommentsOrderByLikes(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
         Pageable pageable = PageRequest.of(page - 1, size);
-        return new ResponseEntity<>(commentService.getCommetsByPostIdOrderByLikeCount(postId, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(commentService.getCommetsByPostIdOrderByLikeCount(postId, userId,pageable), HttpStatus.OK);
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
