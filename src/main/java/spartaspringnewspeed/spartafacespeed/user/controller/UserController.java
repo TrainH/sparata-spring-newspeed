@@ -74,16 +74,19 @@ public class UserController {
         return new ResponseEntity<>(ProfileResponse, HttpStatus.OK);
     }
 
-    @PatchMapping("/{userId}/updateProfile")
-    public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId, @RequestBody ProfileRequest dto) {
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<ProfileResponse> updateProfile( @RequestBody ProfileRequest dto,HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
 
         ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
 
         return new ResponseEntity<>(profileResponse, HttpStatus.OK);
     }
 
-    @PatchMapping("/{userId}/updatePassword")
-    public ResponseEntity<ProfileResponse> updatePassword(@PathVariable Long userId,@RequestBody PasswordRequest dto) {
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<ProfileResponse> updatePassword(@RequestBody PasswordRequest dto, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
         userService.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
         return new ResponseEntity<>(HttpStatus.OK);
     }
