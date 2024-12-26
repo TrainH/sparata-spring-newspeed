@@ -3,7 +3,9 @@ package spartaspringnewspeed.spartafacespeed.liking.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import spartaspringnewspeed.spartafacespeed.common.entity.Post;
 import spartaspringnewspeed.spartafacespeed.common.entity.PostLike;
+import spartaspringnewspeed.spartafacespeed.common.entity.User;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
@@ -23,6 +25,8 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
     long countByPost_Id(Long id);
 
     PostLike findByUser_UserIdAndPost_Id(Long userId, Long id);
+
+    boolean existsByUserAndPost(User user, Post post);
 
     default PostLike findByIdOrElseThrow(Long id) {
         return findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Like Id를 찾을 수 없습니다."));

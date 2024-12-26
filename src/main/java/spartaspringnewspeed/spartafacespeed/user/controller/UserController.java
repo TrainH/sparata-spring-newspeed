@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/updateProfile")
-    public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId,@RequestBody ProfileRequest dto) {
+    public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId, @RequestBody ProfileRequest dto) {
 
         ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
 
