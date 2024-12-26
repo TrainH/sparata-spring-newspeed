@@ -35,6 +35,12 @@ public class CommentController {
         return new ResponseEntity<>(commentService.getCommentsByPostId(postId, pageable), HttpStatus.OK);
     }
 
+    @GetMapping("/{postId}/comments/order-likes")
+    public ResponseEntity<Page<CommentPagingDto>> getCommentsOrderByLikes(@PathVariable Long postId, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "1") int page) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return new ResponseEntity<>(commentService.getCommetsByPostIdOrderByLikeCount(postId, pageable), HttpStatus.OK);
+    }
+
     @PutMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<CommentDto> updateComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody UpdateCommentRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");

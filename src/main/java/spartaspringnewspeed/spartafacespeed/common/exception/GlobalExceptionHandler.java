@@ -36,6 +36,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
     }
 
+
+    @ExceptionHandler(CannotLikeOwnContentException.class)
+    public ResponseEntity<String> handleCannotLikeOwnContentException(CannotLikeOwnContentException exception) {
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
