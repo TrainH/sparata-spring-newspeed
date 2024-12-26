@@ -19,6 +19,7 @@ public class PostDto {
     private Long userId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private int likeCount;
 
 
     public PostDto(Post post) {
@@ -27,6 +28,7 @@ public class PostDto {
         this.userId = post.getUser().getUserId();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
+        this.likeCount = post.getLikeCount();
     }
 
 }

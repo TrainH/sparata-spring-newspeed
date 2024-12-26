@@ -25,18 +25,26 @@ public class PostLikeService {
 
         Post post = postRepository.findPostByIdOrThrow(postId);
         User user = userRepository.findByUserIdOrElseThrow(userId);
-        PostLike postLike = new PostLike(user, post);
 
-        if(postLikeRepository.existsByUser_UserIdAndPost_Id(userId,postId)){
-            postLike = postLikeRepository.findByUser_UserIdAndPost_Id(userId,postId);
+        if (postLikeRepository.existsByUserAndPost(user, post)) {
+            PostLike postLike = postLikeRepository.findByUser_UserIdAndPost_Id(userId,postId);
             if(postLike==null){
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,"좋아요 기능의 예기치 않은 예외 발생");
             }
             postLikeRepository.delete(postLikeRepository.findByIdOrElseThrow(postLike.getId()));
-            return "좋아요 취소 완료";
+
+            post.setLikeCount(post.getLikeCount() - 1);
+            postRepository.save(post);
+            return "좋아요 취소";
         }
 
-        postLikeRepository.saveAndFlush(postLike);
+        // PostLike 저장
+        PostLike postLike = new PostLike(user, post);
+        postLikeRepository.save(postLike);
+
+        // likeCount 증가
+        post.setLikeCount(post.getLikeCount() + 1);
+        postRepository.save(post);
 
         return "좋아요";
     }

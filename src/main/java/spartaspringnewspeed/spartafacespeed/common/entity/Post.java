@@ -24,6 +24,9 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id",nullable = false)
     private User user;
 
+    @Column(nullable = false)
+    private int likeCount = 0;
+
     public Post(String content, User user) {
         this.content = content;
         this.user = user;

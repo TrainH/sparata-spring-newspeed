@@ -74,6 +74,7 @@ public class UserController {
         return new ResponseEntity<>(ProfileResponse, HttpStatus.OK);
     }
 
+
     @PatchMapping("/updateProfile")
     public ResponseEntity<ProfileResponse> updateProfile( @RequestBody ProfileRequest dto,HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
