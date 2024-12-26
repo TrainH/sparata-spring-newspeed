@@ -38,9 +38,14 @@ public class UserService {
         return UserDto.convertDto(user);
     }
 
-    public void softDeleteUser(DeletionRequest request) {
+    public void softDeleteUser(Long userId, DeletionRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UserNotFoundException("계정이 존재하지 않습니다."));
+
+        if (!user.getUserId().equals(userId)) {
+            throw new LoginException("본인 계정만 탈퇴 가능합니다.");
+        }
+
         if(passwordEncoder.matches(request.password(), user.getPassword())) {
             user.updateIsDeleted(true);
             userRepository.save(user);
