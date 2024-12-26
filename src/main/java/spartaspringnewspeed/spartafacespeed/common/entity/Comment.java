@@ -31,6 +31,10 @@ public class Comment extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
+    @Column(nullable = false)
+    @Setter
+    private int likeCount = 0;
+
     public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;

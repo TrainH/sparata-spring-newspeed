@@ -26,7 +26,7 @@ public class CommentLike {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
 
     public CommentLike(User user, Comment comment) {

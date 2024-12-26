@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import spartaspringnewspeed.spartafacespeed.liking.model.dto.PostLikeDto;
 import spartaspringnewspeed.spartafacespeed.liking.service.PostLikeService;
 
 @RestController

@@ -56,7 +56,11 @@ public class CommentService {
      * @return Page<CommentDto>
      */
     public Page<CommentPagingDto> getCommentsByPostId(Long postId, Pageable pageable) {
-        return commentRepository.findAllByPostIdWithCount(postId, pageable);
+        return commentRepository.findByPostIdOrderByCreatedAtDesc(postId,pageable).map(CommentPagingDto::new);
+    }
+
+    public Page<CommentPagingDto> getCommetsByPostIdOrderByLikeCount(Long postId, Pageable pageable) {
+        return commentRepository.findByPostIdOrderByLikeCountDescCreatedAtDesc(postId,pageable).map(CommentPagingDto::new);
     }
 
     /**
