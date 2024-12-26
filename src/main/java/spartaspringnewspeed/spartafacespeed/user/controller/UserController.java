@@ -76,19 +76,19 @@ public class UserController {
 
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<ProfileResponse> updateProfile( @RequestBody ProfileRequest dto,HttpSession session) {
+    public ResponseEntity<String> updateProfile(@Valid@RequestBody ProfileRequest dto,HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
 
         ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
 
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        return new ResponseEntity<>("변경이 완료되었습니다.", HttpStatus.OK);
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<ProfileResponse> updatePassword(@RequestBody PasswordRequest dto, HttpSession session) {
+    public ResponseEntity<String> updatePassword(@Valid@RequestBody PasswordRequest dto, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         userService.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("비밀번호가 변경되었습니다.", HttpStatus.OK);
     }
 
 }
