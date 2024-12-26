@@ -20,5 +20,4 @@ public class PostLikeController {
         Long userId = (Long) session.getAttribute("userId");
         return new ResponseEntity<>(postLikeService.pushPostLike(postId,userId), HttpStatus.CREATED);
     }
-
 }

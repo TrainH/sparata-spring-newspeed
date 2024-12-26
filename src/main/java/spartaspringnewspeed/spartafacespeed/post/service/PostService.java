@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import spartaspringnewspeed.spartafacespeed.comment.repository.CommentRepository;
 import spartaspringnewspeed.spartafacespeed.common.entity.Comment;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
 import spartaspringnewspeed.spartafacespeed.liking.repository.PostLikeRepository;
 import spartaspringnewspeed.spartafacespeed.post.model.request.CreatePostRequest;
 import spartaspringnewspeed.spartafacespeed.post.model.request.UpdatePostRequest;
@@ -34,14 +35,16 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostLikeRepository postLikeRepository;
+    private final FriendRepository postFriendRepository;
 
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, PostLikeRepository postLikeRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, PostLikeRepository postLikeRepository, FriendRepository postFriendRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.postLikeRepository = postLikeRepository;
+        this.postFriendRepository = postFriendRepository;
     }
 
     //게시물 등록
@@ -57,14 +60,28 @@ public class PostService {
         return new PostDto(savedPost);
     }
 
+    // 친구 관련, 좋아요 많은 순,  관련 정렬
+    //    기간별 검색기능
     //페이제네이션
-    public PostPageDto getPostpeed(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("updatedAt")));
+    //    public PostPageDto getPostpeed(int page, int size) {
+
+    public PostPageDto getPostsOrderByCreatedAtDesc(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt")));
         Page<Post> postPage = postRepository.findAll(pageable);
 
         Page<PostDto> postDtoPage = postPage.map(PostDto::new);
 
         return PostPageDto.fromPage(postDtoPage);
+    }
+
+    public PostPageDto getPostsOrderByLikeCountDesc(int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("likeCount")));
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        Page<PostDto> postDtoPage = postPage.map(PostDto::new);
+
+        return PostPageDto.fromPage(postDtoPage);
+
     }
 
 

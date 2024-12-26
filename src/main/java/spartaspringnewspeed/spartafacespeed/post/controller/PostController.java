@@ -38,13 +38,25 @@ public class PostController {
         return ResponseEntity.ok(createdPost);
     }
 
-    @GetMapping
-    public ResponseEntity<PostPageDto> getAllPosts(
-            @RequestParam(defaultValue = "0") int page,
+//    시간순
+    @GetMapping("/timeorder")
+    public ResponseEntity<PostPageDto> getAllPostsByUpdatedAtDesc(
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         // page와 size를 전달받아서 PostService에서 처리한 결과를 반환
-        PostPageDto postPageDto = postService.getPostpeed(page, size);
+        PostPageDto postPageDto = postService.getPostsOrderByCreatedAtDesc(page-1, size);
+        return ResponseEntity.ok(postPageDto);
+    }
+
+//    좋아요 순서 조회
+    @GetMapping("/likeorder")
+    public ResponseEntity<PostPageDto> getAllPostsByLikeCountDesc(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // page와 size를 전달받아서 PostService에서 처리한 결과를 반환
+        PostPageDto postPageDto = postService.getPostsOrderByLikeCountDesc(page-1, size);
         return ResponseEntity.ok(postPageDto);
     }
 
