@@ -44,7 +44,7 @@ public class FriendController {
             friendService.sendFriendRequest(requesterId, dto.getReceiverId());
             return ResponseEntity.status(HttpStatus.CREATED).body("Friend request sent successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Fail: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Fail: " + e.getMessage());
         }
     }
 
@@ -56,7 +56,7 @@ public class FriendController {
             List<FriendResponse> friendRequests = friendService.getPendingFriendRequests(receiverId);
             return ResponseEntity.ok(friendRequests);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -69,7 +69,7 @@ public class FriendController {
             List<FriendResponse> pendingRequests = friendService.getPendingFriendRequests(receiverId);
             return ResponseEntity.ok(pendingRequests);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ public class FriendController {
                 return ResponseEntity.badRequest().body("Invalid status value");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error: " + e.getMessage());
         }
     }
@@ -113,7 +113,7 @@ public class FriendController {
             List<FriendInfoResponse> friends = friendService.getFriendsList(userId);
             return ResponseEntity.ok(friends);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
 
@@ -133,7 +133,7 @@ public class FriendController {
             return ResponseEntity.ok("Friend relationship has been deleted");
         } catch (Exception e) {
             // Handle exceptions and return an appropriate response
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error deleting friend: " + e.getMessage());
         }
     }
