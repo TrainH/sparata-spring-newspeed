@@ -11,10 +11,11 @@ import org.springframework.validation.BindingResult;
 
 import org.springframework.web.bind.annotation.*;
 import spartaspringnewspeed.spartafacespeed.common.entity.FriendshipStatus;
+import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendDeleteRequest;
 import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendRequest;
-import spartaspringnewspeed.spartafacespeed.friend.model.request.FriendRequestStatusUpdate;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendInfoResponse;
 import spartaspringnewspeed.spartafacespeed.friend.model.response.FriendResponse;
+import spartaspringnewspeed.spartafacespeed.friend.repository.FriendRepository;
 import spartaspringnewspeed.spartafacespeed.friend.service.FriendService;
 import spartaspringnewspeed.spartafacespeed.user.model.dto.UserDto;
 
@@ -27,6 +28,8 @@ public class FriendController {
 
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private FriendRepository friendRepository;
 
     // 친구 요청 처리
     @PostMapping("/requests")
@@ -47,9 +50,14 @@ public class FriendController {
 
     // 친구 요청 페이지 이동
     @GetMapping("/requests")
-    public ResponseEntity<FriendRequest> getAllFriendRequests() {
-        FriendRequest friendRequest = new FriendRequest();
-        return ResponseEntity.ok(friendRequest);
+    public ResponseEntity<List<FriendResponse>> getAllFriendRequests(HttpSession session) {
+        try {
+            Long receiverId = (Long) session.getAttribute("userId");
+            List<FriendResponse> friendRequests = friendService.getPendingFriendRequests(receiverId);
+            return ResponseEntity.ok(friendRequests);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 
@@ -65,14 +73,13 @@ public class FriendController {
         }
     }
 
-    // 친구 요청 변경
+    // 친구 요청을 '친구 요청 아이디 기반으로 변경'
     @PatchMapping("/requests/{requestId}")
     public ResponseEntity<String> acceptFriendRequest(@PathVariable Long requestId,
-                                                      @RequestBody FriendRequestStatusUpdate dto,
                                                       HttpSession session) {
         try {
-            Long userId = (Long) session.getAttribute("userId");
-            friendService.confirmFriendRequest(userId, dto.getOriginalRequesterId(), dto.getStatus());
+            Long myId = (Long) session.getAttribute("userId");
+            friendService.confirmFriendRequest(requestId, myId);
             return ResponseEntity.ok("Friend request changed");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
@@ -92,14 +99,28 @@ public class FriendController {
         }
     }
 
-    @DeleteMapping("/{friendId}")
-    public ResponseEntity<String> deleteFriend(@PathVariable Long friendId, HttpSession session) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteFriend(@Valid @RequestBody FriendDeleteRequest dto, BindingResult bindingResult, HttpSession session) {
+        if (bindingResult.hasErrors()) {
+            // Handle validation errors
+            return ResponseEntity.badRequest().body("Invalid request data");
+        }
+
+        // Get the current user's ID from the session
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            // User is not authenticated
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not logged in");
+        }
+
         try {
-            Long userId = (Long) session.getAttribute("userId");
-            friendService.deleteFriend(userId, friendId);
-            return ResponseEntity.ok("Friend delete done");
+            // Call the service method to mark the friend relationship as DELETED
+            friendService.deleteFriend(userId, dto.getFriendUserId());
+            return ResponseEntity.ok("Friend relationship has been deleted");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            // Handle exceptions and return an appropriate response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting friend: " + e.getMessage());
         }
     }
 
