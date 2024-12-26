@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import spartaspringnewspeed.spartafacespeed.common.entity.Post;
 import spartaspringnewspeed.spartafacespeed.common.entity.PostLike;
 import spartaspringnewspeed.spartafacespeed.common.entity.User;
+import spartaspringnewspeed.spartafacespeed.common.exception.CannotLikeOwnContentException;
 import spartaspringnewspeed.spartafacespeed.liking.model.dto.PostLikeDto;
 import spartaspringnewspeed.spartafacespeed.liking.repository.PostLikeRepository;
 import spartaspringnewspeed.spartafacespeed.post.repository.PostRepository;
@@ -25,6 +26,10 @@ public class PostLikeService {
 
         Post post = postRepository.findPostByIdOrThrow(postId);
         User user = userRepository.findByUserIdOrElseThrow(userId);
+
+        if(post.getUser().getUserId().equals(userId)) {
+            throw new CannotLikeOwnContentException();
+        }
 
         if (postLikeRepository.existsByUserAndPost(user, post)) {
             PostLike postLike = postLikeRepository.findByUser_UserIdAndPost_Id(userId,postId);

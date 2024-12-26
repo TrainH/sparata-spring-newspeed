@@ -19,6 +19,7 @@ public class CommentDto {
     private Long postId;
     private UserDto user;
     private String content;
+    private int likeCount;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -29,5 +30,6 @@ public class CommentDto {
         this.content = comment.getContent();
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getUpdatedAt();
+        this.likeCount = comment.getLikeCount();
     }
 }

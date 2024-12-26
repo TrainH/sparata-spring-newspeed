@@ -27,7 +27,8 @@ public class UserController {
 
     @PatchMapping("/deletion")
     public ResponseEntity<String> softDeleteUser(@Valid @RequestBody DeletionRequest request, HttpSession session) {
-        userService.softDeleteUser(request);
+        Long userId = (Long) session.getAttribute("userId");
+        userService.softDeleteUser(userId, request);
         session.invalidate();
         return new ResponseEntity<>("삭제 되었습니다. ", HttpStatus.OK);
     }
@@ -74,18 +75,21 @@ public class UserController {
         return new ResponseEntity<>(ProfileResponse, HttpStatus.OK);
     }
 
-    @PatchMapping("/{userId}/updateProfile")
-    public ResponseEntity<ProfileResponse> updateProfile(@PathVariable Long userId, @RequestBody ProfileRequest dto) {
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<String> updateProfile(@Valid@RequestBody ProfileRequest dto,HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
 
         ProfileResponse profileResponse = userService.updateProfile(userId, dto.getProfileName(), dto.getProfileEmail());
 
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        return new ResponseEntity<>("변경이 완료되었습니다.", HttpStatus.OK);
     }
 
-    @PatchMapping("/{userId}/updatePassword")
-    public ResponseEntity<ProfileResponse> updatePassword(@PathVariable Long userId,@RequestBody PasswordRequest dto) {
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<String> updatePassword(@Valid@RequestBody PasswordRequest dto, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
         userService.updatePassword(userId, dto.getOldPassword(), dto.getNewPassword());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("비밀번호가 변경되었습니다.", HttpStatus.OK);
     }
 
 }
