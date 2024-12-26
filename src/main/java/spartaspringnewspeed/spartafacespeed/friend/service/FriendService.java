@@ -40,14 +40,41 @@ public class FriendService {
             throw new Exception("Cannot send friend request to yourself");
         }
 
-        // 이미 친구 요청이 있거나 친구인 경우 확인 (양방향 검사)
-        List<FriendshipStatus> statusesToCheck = Arrays.asList(FriendshipStatus.PENDING, FriendshipStatus.ACCEPTED);
+        // 두 사용자 사이의 기존 친구 관계 확인 (양방향 검사)
+        Optional<Friend> existingFriendship = friendRepository.findByRequesterAndReceiver(requester, receiver);
+        Optional<Friend> reverseFriendship = friendRepository.findByRequesterAndReceiver(receiver, requester);
 
-        if (friendRepository.existsFriendshipBetweenUsers(requester, receiver, statusesToCheck)) {
-            throw new Exception("Friend request already sent or already friends");
+        if (existingFriendship.isPresent()) {
+            FriendshipStatus status = existingFriendship.get().getStatus();
+            if (status == FriendshipStatus.PENDING || status == FriendshipStatus.ACCEPTED) {
+                throw new Exception("Friend request already sent or already friends");
+            } else if (status == FriendshipStatus.DELETED) {
+                // 상태를 PENDING으로 업데이트하고 저장
+                Friend friendship = existingFriendship.get();
+                friendship.setStatus(FriendshipStatus.PENDING);
+                friendship.setRequester(requester);
+                friendship.setReceiver(receiver);
+                friendRepository.save(friendship);
+                return;
+            }
         }
 
-        // 친구 요청 생성
+        if (reverseFriendship.isPresent()) {
+            FriendshipStatus status = reverseFriendship.get().getStatus();
+            if (status == FriendshipStatus.PENDING || status == FriendshipStatus.ACCEPTED) {
+                throw new Exception("Friend request already sent or already friends");
+            } else if (status == FriendshipStatus.DELETED) {
+                // 상태를 PENDING으로 업데이트하고 요청자와 수락자를 변경
+                Friend friendship = reverseFriendship.get();
+                friendship.setStatus(FriendshipStatus.PENDING);
+                friendship.setRequester(requester);
+                friendship.setReceiver(receiver);
+                friendRepository.save(friendship);
+                return;
+            }
+        }
+
+        // 기존 친구 관계가 없으므로 새로운 친구 요청 생성
         Friend friendRequest = new Friend();
         friendRequest.setRequester(requester);
         friendRequest.setReceiver(receiver);
@@ -57,20 +84,6 @@ public class FriendService {
     }
 
     @Transactional
-    public void confirmFriendRequest(Long originalReceiverId, Long originalRequesterId, FriendshipStatus status) throws Exception {
-        User originalRequester = userRepository.findByUserId(originalRequesterId)
-                .orElseThrow(() -> new Exception("Requester not found"));
-        User originalReceiver = userRepository.findByUserId(originalReceiverId)
-                .orElseThrow(() -> new Exception("Requester not found"));
-        Friend requestedFriend = friendRepository.findByRequesterAndReceiverAndStatus(originalRequester, originalReceiver, FriendshipStatus.PENDING)
-                .orElseThrow(() -> new Exception("Friend Relationship not found"));
-
-        requestedFriend.setStatus(status);
-
-        friendRepository.save(requestedFriend);
-    }
-
-
     public List<FriendResponse> getPendingFriendRequests(Long userId) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("User not found"));
@@ -80,35 +93,79 @@ public class FriendService {
         return pendingRequests.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    @Transactional
+    public void confirmFriendRequest(Long requestId, Long myId) throws Exception {
+        User user = userRepository.findByUserIdOrElseThrow(myId);
+
+        Friend requestedFriend = friendRepository.findByIdAndReceiverAndStatus(
+                        requestId, user, FriendshipStatus.PENDING)
+                .orElseThrow(() -> new Exception("Friend Relationship not found"));
+
+        requestedFriend.setStatus(FriendshipStatus.ACCEPTED);
+
+        // Check if the reversed friend relationship already exists
+        Optional<Friend> existingReverseFriendOpt = friendRepository.findByRequesterAndReceiver(
+                user, requestedFriend.getRequester());
+
+        Friend reverseFriend;
+        if (existingReverseFriendOpt.isPresent()) {
+            // Update the existing relationship's status to ACCEPTED
+            reverseFriend = existingReverseFriendOpt.get();
+            reverseFriend.setStatus(FriendshipStatus.ACCEPTED);
+        } else {
+            // Create a new reversed friend relationship
+            reverseFriend = new Friend();
+            reverseFriend.setRequester(user);
+            reverseFriend.setReceiver(requestedFriend.getRequester());
+            reverseFriend.setStatus(FriendshipStatus.ACCEPTED);
+        }
+
+        // Save both relationships
+        friendRepository.save(requestedFriend);
+        friendRepository.save(reverseFriend);
+    }
+
+
     public List<FriendInfoResponse> getFriendsList(Long userId) throws Exception {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("User not found"));
 
-        List<Friend> requesterFriends = friendRepository.findByRequesterAndStatus(user, FriendshipStatus.ACCEPTED);
-        List<Friend> receiverFriends = friendRepository.findByReceiverAndStatus(user, FriendshipStatus.ACCEPTED);
+        // 요청자로서의 ACCEPTED 상태 친구만 조회
+        List<Friend> friends = friendRepository.findByRequesterAndStatus(user, FriendshipStatus.ACCEPTED);
 
-        List<Friend> allFriends = new ArrayList<>();
-        allFriends.addAll(requesterFriends);
-        allFriends.addAll(receiverFriends);
-
-        return allFriends.stream()
-                .map(friend -> convertToFriendInfoResponse(friend, user))
+        return friends.stream()
+                .map(this::convertToFriendInfoResponse)
                 .collect(Collectors.toList());
     }
 
-    public void deleteFriend(Long userId, Long friendId) throws Exception { // 친구 관계 등록된 번호로 삭제하기
 
-        friendRepository.deleteById(friendId);
+    @Transactional
+    public void deleteFriend(Long userId, Long friendId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        User friendUser = userRepository.findById(friendId)
+                .orElseThrow(() -> new Exception("Friend user not found"));
+
+        // Mark the friend relationship as DELETED
+        Friend friendRelationship = friendRepository.findByRequesterAndReceiverAndStatus(
+                        user, friendUser, FriendshipStatus.ACCEPTED)
+                .orElseThrow(() -> new Exception("Friend relationship not found"));
+
+        friendRelationship.setStatus(FriendshipStatus.DELETED);
+        friendRepository.save(friendRelationship);
+
+        // Mark the reverse friend relationship as DELETED
+        Friend reverseFriendRelationship = friendRepository.findByRequesterAndReceiverAndStatus(
+                        friendUser, user, FriendshipStatus.ACCEPTED)
+                .orElseThrow(() -> new Exception("Friend relationship not found"));
+
+        reverseFriendRelationship.setStatus(FriendshipStatus.DELETED);
+        friendRepository.save(reverseFriendRelationship);
     }
 
-    private FriendInfoResponse convertToFriendInfoResponse(Friend friend, User currentUser) {
-        User otherUser;
-
-        if (friend.getRequester().equals(currentUser)) {
-            otherUser = friend.getReceiver();
-        } else {
-            otherUser = friend.getRequester();
-        }
+    private FriendInfoResponse convertToFriendInfoResponse(Friend friend) {
+        User otherUser = friend.getReceiver();
 
         return new FriendInfoResponse(
                 otherUser.getUserId(),
