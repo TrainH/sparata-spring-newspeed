@@ -27,7 +27,8 @@ public class UserController {
 
     @PatchMapping("/deletion")
     public ResponseEntity<String> softDeleteUser(@Valid @RequestBody DeletionRequest request, HttpSession session) {
-        userService.softDeleteUser(request);
+        Long userId = (Long) session.getAttribute("userId");
+        userService.softDeleteUser(userId, request);
         session.invalidate();
         return new ResponseEntity<>("삭제 되었습니다. ", HttpStatus.OK);
     }
