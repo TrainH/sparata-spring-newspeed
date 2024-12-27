@@ -133,7 +133,7 @@ public class CommentService {
             return;
         }
         //포스트를 작성한 유저의 친구 목록
-        List<Long> friend = friendRepository.findFriendUserIdsByUserIdAndStatus(userId, FriendshipStatus.ACCEPTED);
+        List<Long> friend = friendRepository.findFriendUserIdsByUserIdAndStatus(post.getUser().getUserId(), FriendshipStatus.ACCEPTED);
 
         int cnt =0;
         for(Long friendsId : friend) {
